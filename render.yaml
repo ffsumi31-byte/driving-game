@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: neon-drift-city
+    runtime: python
+    plan: free
+    region: singapore
+    buildCommand: python -m compileall -q server.py validate_project.py && python validate_project.py
+    startCommand: python server.py
+    healthCheckPath: /healthz
+    autoDeployTrigger: commit
