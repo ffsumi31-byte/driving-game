@@ -50,7 +50,7 @@ def main() -> None:
     audit.feed(html)
     audit.close()
 
-    for element_id in ("game", "start-button", "speed", "drift-angle", "minimap", "camera-name"):
+    for element_id in ("game", "start-button", "speed", "drift-angle", "minimap", "camera-name", "garage-button", "settings-button", "cockpit-button", "game-menu", "skin-grid", "selected-skin-name", "bloom-setting", "atmosphere-setting", "resume-game", "settings-cockpit"):
         if element_id not in audit.ids:
             fail(f"missing game UI element #{element_id}")
 
@@ -66,7 +66,9 @@ def main() -> None:
         fail("Three.js core and addon aliases must both be mapped")
 
     for feature in (
-        "UnrealBloomPass", "ACESFilmicToneMapping", "FogExp2", "MeshPhysicalMaterial",
+        "UnrealBloomPass", "ACESFilmicToneMapping", "FogExp2", "MeshPhysicalMaterial", "new Sky()",
+        "function makeFacade(style)", "bumpMap:t.height", "function updateDriftSmoke",
+        "function setSkin(id)", "function setQuality(level)", "function openMenu(tab",
         "function updateSimulation(dt)", "lateralGrip", "yawRate", "handbrake",
         "bodyRoll", "wheelGroups", "function collide()",
     ):
@@ -86,6 +88,17 @@ def main() -> None:
     for marker in ("runtime: python", "startCommand: python server.py", "healthCheckPath: /healthz"):
         if marker not in render:
             fail(f"Render configuration missing {marker!r}")
+
+    ui_markers = ["#quick-actions", ".skin-card.active", "#game-menu.open", 'data-menu-tab="settings"', 'data-quality="ultra"']
+    for marker in ui_markers:
+        if marker not in html:
+            fail(f"missing garage/settings UI marker {marker!r}")
+
+    # Literal UI bindings must resolve to real markup IDs before this gets deployed.
+    literal_refs = set(re.findall(r"\$\('([^']+)'\)", html))
+    missing_refs = sorted(literal_refs - audit.ids)
+    if missing_refs:
+        fail(f"script references missing element IDs: {missing_refs}")
 
     module_count = sum(script["type"] == "module" for script in audit.scripts)
     if module_count != 1:

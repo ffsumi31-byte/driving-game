@@ -39,7 +39,7 @@ Object.assign(globalThis, {
   gaugeNeedles: [{ rotation: { z: 0 } }, { rotation: { z: 0 } }],
   headlights: [{ intensity: 0 }, { intensity: 0 }],
   tailLights: [{ intensity: 0 }, { intensity: 0 }],
-  collidersExpanded: [], updateAudio: () => {},
+  collidersExpanded: [], updateAudio: () => {}, updateDriftSmoke: () => {},
 });
 const ids = ['center-alert', 'alert-copy', 'drift-angle', 'drift-points', 'combo', 'traction-status', 'speed', 'gear', 'rpm', 'rpm-fill'];
 const elements = Object.fromEntries(ids.map(id => [id, { textContent: '', style: {} }]));
